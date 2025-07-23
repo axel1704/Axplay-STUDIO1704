@@ -1,110 +1,41 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>AxPlay STUDIO</title>
-  <link rel="stylesheet" href="style.css" />
+<!-- Reproductor mejorado con Plyr.js -->
+<div id="reproductor" style="display:none; max-width: 1000px; margin: auto;">
+  <video id="video-player" playsinline controls style="width:100%; height:auto;">
+    <source src="" type="application/x-mpegURL" />
+  </video>
+</div>
 
-  <!-- Plyr.js CSS -->
-  <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
+<!-- Plyr.js (CSS y JS) -->
+<link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
+<script src="https://cdn.plyr.io/3.7.8/plyr.polyfilled.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
 
-  <!-- Manifest para instalación -->
-  <link rel="manifest" href="/manifest.json" />
-  <meta name="theme-color" content="#0d6efd">
-</head>
+<script>
+  const video = document.getElementById('video-player');
+  const reproductor = document.getElementById('reproductor');
+  const peliculas = document.querySelectorAll('.pelicula');
 
-<body>
-  <header>
-    <div class="barra-superior">
-      <img src="https://i.postimg.cc/VdZwtT0t/axplay.png" alt="AxPlay Logo" class="logo">
-      <h1>🎬AxPlay STUDIO🎬</h1>
-      <input type="text" id="buscador" placeholder="Buscar películas...">
-    </div>
-  </header>
+  const player = new Plyr(video);
 
-  <!-- 🎥 Reproductor con Plyr.js -->
-  <div id="reproductor" style="display:none; max-width: 1000px; margin: auto;">
-    <video id="video-player" class="plyr__video-embed" playsinline controls>
-      <source src="" type="application/x-mpegURL" />
-    </video>
-  </div>
+  peliculas.forEach(peli => {
+    peli.addEventListener('click', () => {
+      const url = peli.getAttribute('data-video');
 
-  <main>
-    <section class="fila">
-      <section class="tendencias">
-        <h2>🔥 Tendencias 🔥</h2>
-        <div class="carrusel" id="carrusel-tendencias"></div>
-      </section>
-
-      <h2>🔝 RECOMENDADAS 🔝</h2>
-      <div class="pelis-contenedor" id="pelis-recomendadas"></div>
-    </section>
-  </main>
-
-  <section class="fila">
-    <h2>🎯 ACCIÓN 🎯</h2>
-    <div class="pelis-contenedor" id="pelis-accion"></div>
-  </section>
-
-  <section class="fila">
-    <h2>😂 Comedia 😂</h2>
-    <div class="pelis-contenedor" id="pelis-comedia"></div>
-  </section>
-
-  <section class="fila">
-    <h2>👻 Terror 👻</h2>
-    <div class="pelis-contenedor" id="pelis-terror"></div>
-  </section>
-
-  <footer>
-    <p>&copy;⭐ FILM HD AxPlay STUDIO ⭐ 2025</p>
-  </footer>
-
-  <!-- 🎬 Miniatura de película con video externo -->
-  <div class="peliculas">
-    <img src="https://i.postimg.cc/Wt8DCP91/Deadpool.jpg" 
-         alt="Deadpool"
-         class="pelicula"
-         data-video="https://vide0.net/e/2kqi66h8drcr">
-  </div>
-
-  <!-- Plyr.js -->
-  <script src="https://cdn.plyr.io/3.7.8/plyr.polyfilled.js"></script>
-  <!-- HLS.js (para compatibilidad con navegadores sin soporte HLS nativo) -->
-  <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
-
-  <!-- Script de reproducción -->
-  <script>
-    const video = document.getElementById('video-player');
-    const reproductor = document.getElementById('reproductor');
-    const peliculas = document.querySelectorAll('.pelicula');
-
-    const player = new Plyr(video);
-
-    peliculas.forEach(peli => {
-      peli.addEventListener('click', () => {
-        const url = peli.getAttribute('data-video');
-
-        if (Hls.isSupported()) {
-          const hls = new Hls();
-          hls.loadSource(url);
-          hls.attachMedia(video);
-          hls.on(Hls.Events.MANIFEST_PARSED, () => {
-            reproductor.style.display = 'block';
-            video.play();
-          });
-        } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-          video.src = url;
+      if (Hls.isSupported()) {
+        const hls = new Hls();
+        hls.loadSource(url);
+        hls.attachMedia(video);
+        hls.on(Hls.Events.MANIFEST_PARSED, () => {
           reproductor.style.display = 'block';
           video.play();
-        } else {
-          alert('Tu navegador no soporta reproducción de este video.');
-        }
-      });
+        });
+      } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+        video.src = url;
+        reproductor.style.display = 'block';
+        video.play();
+      } else {
+        alert('Tu navegador no soporta este tipo de video.');
+      }
     });
-  </script>
-
-  <script src="script.js"></script>
-</body>
-</html>
+  });
+</script>
